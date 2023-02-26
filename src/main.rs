@@ -7,11 +7,18 @@ fn main() {
     for stream in listener.incoming() {
         match stream {
             Ok(mut _stream) => {
-                println!("conn accept!");
+                println!("connection accept!");
                 let mut buf = [0; 512];
-                _stream.read(&mut buf).unwrap();
 
-                _stream.write("+PONG\r\n".as_bytes()).unwrap();
+                loop {
+                    let bytes_read = _stream.read(&mut buf).unwrap();
+                    if bytes_read == 0 {
+                        println!("connection close");
+                        break
+                    }
+
+                    _stream.write("+PONG\r\n".as_bytes()).unwrap();
+                }
             }
             Err(e) => {
                 println!("error: {}", e);
